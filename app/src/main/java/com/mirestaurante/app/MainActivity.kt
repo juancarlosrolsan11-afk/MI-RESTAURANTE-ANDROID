@@ -97,7 +97,7 @@ fun Inicio(d:Datos,go:(String)->Unit){
 fun Inventario(ps:List<Producto>,add:()->Unit,edit:(Producto)->Unit,del:(Producto)->Unit){
  Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){Text("INVENTARIO",style=MaterialTheme.typography.headlineSmall);Button(add){Text("+ PRODUCTO")}}
  Text("PESO/CANTIDAD • STOCK MÍNIMO • PRECIO DE COMPRA")
- LazyColumn(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(8.dp)){items(ps,key={it.nombre}){p->Card(Modifier.fillMaxWidth()){Column(Modifier.padding(12.dp)){
+ LazyColumn(Modifier.fillMaxWidth().heightIn(max=520.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){items(ps,key={it.nombre}){p->Card(Modifier.fillMaxWidth()){Column(Modifier.padding(12.dp)){
   Text(p.nombre,style=MaterialTheme.typography.titleMedium);Text("EXISTENCIA: %.3f %s".format(p.stock,p.unidad));Text("MÍNIMO: %.3f %s".format(p.minimo,p.unidad));Text("COMPRA: \$%,.0f / %s".format(p.precio,p.unidad))
   if(p.stock<=p.minimo)Text("⚠ STOCK BAJO");Row{TextButton({edit(p)}){Text("EDITAR")};TextButton({del(p)}){Text("ELIMINAR")}}
  }}}}
@@ -108,7 +108,7 @@ fun Menu(ps:List<Producto>,ms:List<Plato>,add:()->Unit,edit:(Plato)->Unit,del:(P
  var qty by remember{mutableStateOf(mapOf<String,Int>())}
  Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){Text("MENÚ",style=MaterialTheme.typography.headlineSmall);Button(add){Text("+ PLATO / CAJA")}}
  Text("Cada venta descuenta automáticamente los ingredientes.")
- LazyColumn(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(8.dp)){items(ms,key={it.nombre}){m->
+ LazyColumn(Modifier.fillMaxWidth().heightIn(max=520.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){items(ms,key={it.nombre}){m->
   val cost=m.consumo.entries.sumOf{(n,v)->v*(ps.firstOrNull{it.nombre.equals(n,true)}?.precio?:0.0)}
   Card(Modifier.fillMaxWidth()){Column(Modifier.padding(12.dp)){Text(m.nombre,style=MaterialTheme.typography.titleMedium);Text("VENTA: \$%,.0f".format(m.precio))
    Text("COSTO: \$%,.0f • GANANCIA: \$%,.0f".format(cost,m.precio-cost));Text("CONSUMO: "+m.consumo.entries.joinToString{it.key+" %.3f".format(it.value)})
