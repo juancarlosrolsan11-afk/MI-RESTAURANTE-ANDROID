@@ -44,6 +44,7 @@ private fun cargar(c:Context):Datos{
 
 class MainActivity:ComponentActivity(){override fun onCreate(s:Bundle?){super.onCreate(s);setContent{App(this)}}}
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun App(context:Context){
  var d by remember{mutableStateOf(cargar(context))};var page by remember{mutableStateOf("INICIO")}
