@@ -22,9 +22,48 @@ data class Datos(val productos:List<Producto>,val menu:List<Plato>,val ventas:In
 private const val PREF="mi_restaurante"
 private const val KEY="datos"
 
+private fun menuJJ()=listOf(
+ Plato("SALMÓN - A LA PLANCHA",45000.0,emptyMap()),
+ Plato("SALMÓN - SALSA DE QUESO",45000.0,emptyMap()),
+ Plato("SALMÓN - SALSA DE CHAMPIÑÓN",45000.0,emptyMap()),
+ Plato("SALMÓN - SALSA DE CAMARÓN",80000.0,emptyMap()),
+ Plato("TRUCHA - A LA PLANCHA",30000.0,emptyMap()),
+ Plato("TRUCHA - AJILLO",30000.0,emptyMap()),
+ Plato("TRUCHA - A LA CREMA",40000.0,emptyMap()),
+ Plato("TRUCHA - SALSA DE QUESO",35000.0,emptyMap()),
+ Plato("CAZUELA DE PESCADO",60000.0,emptyMap()),
+ Plato("CAZUELA DE CAMARONES",65000.0,emptyMap()),
+ Plato("BOCACHICO 800 G - FRITO",50000.0,emptyMap()),
+ Plato("BOCACHICO 800 G - SALSA CRIOLLA",50000.0,emptyMap()),
+ Plato("BOCACHICO 800 G - FRITO SUDADO",50000.0,emptyMap()),
+ Plato("CACHAMA - SALSA CRIOLLA",30000.0,emptyMap()),
+ Plato("CACHAMA - FRITA",30000.0,emptyMap()),
+ Plato("CACHAMA - FRITA SUDADA",30000.0,emptyMap()),
+ Plato("MOJARRA - FRITA",30000.0,emptyMap()),
+ Plato("MOJARRA - FRITA SUDADA",30000.0,emptyMap()),
+ Plato("MOJARRA - SALSA CRIOLLA",30000.0,emptyMap()),
+ Plato("CEVICHE DE CAMARÓN - SALSA ROSADA",30000.0,emptyMap()),
+ Plato("CEVICHE DE CAMARÓN - SALSA ROJA",30000.0,emptyMap()),
+ Plato("CEVICHE DE CAMARÓN - SALSA CRIOLLA",35000.0,emptyMap()),
+ Plato("BAGRE - SALSA DE CAMARÓN",45000.0,emptyMap()),
+ Plato("BAGRE - FRITO SUDADO",35000.0,emptyMap()),
+ Plato("BAGRE - FRITO",30000.0,emptyMap()),
+ Plato("PECHUGA - SALSA DE QUESO",30000.0,emptyMap()),
+ Plato("PECHUGA - A LA PLANCHA",28000.0,emptyMap()),
+ Plato("PECHUGA - SALSA DE CHAMPIÑÓN",35000.0,emptyMap()),
+ Plato("CERDO - LOMO",30000.0,emptyMap()),
+ Plato("CERDO - SALSA DE CHAMPIÑÓN",35000.0,emptyMap()),
+ Plato("CERDO - A LA PLANCHA",30000.0,emptyMap()),
+ Plato("CERDO - BBQ",30000.0,emptyMap()),
+ Plato("RES - ENCEBOLLADA",30000.0,emptyMap()),
+ Plato("RES - A LA PLANCHA",30000.0,emptyMap()),
+ Plato("RES - BISTEC",30000.0,emptyMap()),
+ Plato("PLATO EJECUTIVO",20000.0,emptyMap())
+)
+
 private fun inicial()=Datos(
  listOf(Producto("CARNE","KG",20.0,2.0,28000.0),Producto("CERDO","KG",15.0,2.0,22000.0),Producto("POLLO","KG",12.0,2.0,18000.0),Producto("CHICHARRÓN","KG",10.0,2.0,25000.0)),
- listOf(Plato("CARNE ASADA",25000.0,mapOf("CARNE" to .30)),Plato("CARNE Y CERDO",28000.0,mapOf("CARNE" to .20,"CERDO" to .20)),Plato("POLLO",20000.0,mapOf("POLLO" to .30)),Plato("CHICHARRÓN",22000.0,mapOf("CHICHARRÓN" to .25))),0,0.0,0.0)
+ menuJJ(),0,0.0,0.0)
 
 private fun guardar(c:Context,d:Datos){
  val r=JSONObject();val ps=JSONArray();d.productos.forEach{p->ps.put(JSONObject().apply{put("n",p.nombre);put("u",p.unidad);put("s",p.stock);put("m",p.minimo);put("p",p.precio)})}
@@ -38,7 +77,9 @@ private fun cargar(c:Context):Datos{
  return try{
   val r=JSONObject(raw);val a=r.getJSONArray("ps");val ps=buildList{for(i in 0 until a.length()){val x=a.getJSONObject(i);add(Producto(x.getString("n"),x.getString("u"),x.getDouble("s"),x.optDouble("m",2.0),x.getDouble("p")))}}
   val b=r.getJSONArray("ms");val ms=buildList{for(i in 0 until b.length()){val x=b.getJSONObject(i);val co=x.getJSONObject("c");val map=mutableMapOf<String,Double>();co.keys().forEach{map[it]=co.getDouble(it)};add(Plato(x.getString("n"),x.getDouble("p"),map))}}
-  Datos(ps,ms,r.optInt("v"),r.optDouble("i"),r.optDouble("k"))
+  val existentes=ms.associateBy{it.nombre.uppercase()}.toMutableMap()
+  menuJJ().forEach{base->if(!existentes.containsKey(base.nombre.uppercase()))existentes[base.nombre]=base}
+  Datos(ps,existentes.values.toList(),r.optInt("v"),r.optDouble("i"),r.optDouble("k"))
  }catch(_:Exception){inicial()}
 }
 
@@ -148,6 +189,6 @@ fun PlatoDialog(initial:Plato?,ps:List<Producto>,close:()->Unit,save:(Plato)->Un
  }},confirmButton={TextButton({
   val price=p.replace(",",".").toDoubleOrNull();val map=mutableMapOf<String,Double>()
   r.split(",").forEach{z->val x=z.split("=");if(x.size==2){val v=x[1].trim().replace(",",".").toDoubleOrNull();if(!x[0].trim().isBlank()&&v!=null&&v>0)map[x[0].trim().uppercase()]=v}}
-  if(n.isNotBlank()&&price!=null&&map.isNotEmpty())save(Plato(n.trim().uppercase(),price,map))
+  if(n.isNotBlank()&&price!=null)save(Plato(n.trim().uppercase(),price,map))
  }){Text("GUARDAR")}},dismissButton={TextButton(close){Text("CANCELAR")}})
 }
