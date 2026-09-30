@@ -89,7 +89,7 @@ private fun cargar(c:Context):Datos{
   )
   val existentes=ms.filterNot{nombresAntiguos.contains(it.nombre.uppercase())}.associateBy{it.nombre.uppercase()}.toMutableMap()
   menuJJ().forEach{base->existentes[base.nombre.uppercase()] = existentes[base.nombre.uppercase()]?.let{old->
-    old.copy(nombre=base.nombre)
+    old.copy(nombre=base.nombre, precio=0.0)
   } ?: base}
   Datos(ps,existentes.values.toList(),r.optInt("v"),r.optDouble("i"),r.optDouble("k"))
  }catch(_:Exception){inicial()}
